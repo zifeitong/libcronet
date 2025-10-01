@@ -12,8 +12,8 @@ pkgver=$1
 
 if [ ! -d chromium-$pkgver ]; then
   echo "Download and extract chromium tarball..."
-  wget -c https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$pkgver-lite.tar.xz
-  tar -xvf chromium-$pkgver-lite.tar.xz
+  wget -c --no-verbose --show-progress --progress=dot:mega https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$pkgver-lite.tar.xz
+  tar -xf chromium-$pkgver-lite.tar.xz
 fi
 
 pushd chromium-$pkgver
