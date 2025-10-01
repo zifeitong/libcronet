@@ -1,0 +1,21 @@
+name: Build and release libcronet
+
+on:
+  workflow_dispatch
+
+jobs:
+  build-and-release:
+
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5.0.0
+
+      - name: Build cronet
+        run: scripts/build.sh `cat VERSION`
