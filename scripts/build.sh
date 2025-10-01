@@ -7,6 +7,7 @@
 # Reference:
 #   https://gitlab.archlinux.org/archlinux/packaging/packages/chromium
 #   https://gitweb.gentoo.org/repo/gentoo.git/tree/www-client/chromium
+set -ex
 
 pkgver=$1
 
@@ -19,7 +20,7 @@ fi
 pushd chromium-$pkgver
 
 # Apply patches
-patch -p1 < ../patches/*.patch
+ls ../patches/*.patch | xargs -n 1 patch -p1 -i
 
 # Setup build environment
 ./tools/clang/scripts/update.py
