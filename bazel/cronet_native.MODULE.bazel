@@ -1,0 +1,6 @@
+bazel_dep(name = "cronet_native", version = "141.0.7390.54")
+archive_override(
+    module_name = "cronet_native",
+    url = "https://github.com/zifeitong/libcronet/releases/download/0.0/cronet_native-141.0.7390.54.tar.gz",
+    sha256 = "c9475446431f97e2b72fecc12b0ea5aebae333b4ec1138e72d1be567639cb814",
+)
