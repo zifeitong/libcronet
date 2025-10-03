@@ -1,11 +1,9 @@
 name: Build and release libcronet
 
-on:
-  workflow_dispatch
+on: workflow_dispatch
 
 jobs:
   build-and-release:
-
     runs-on: ubuntu-24.04
 
     permissions:
@@ -17,5 +15,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5.0.0
 
+      - name: Set environment variables
+        run: echo "VERSION=`cat VERSION`" >> $GITHUB_ENV
+
       - name: Build cronet
-        run: scripts/build.sh `cat VERSION`
+        run: scripts/build.sh $VERSION
+
+      - name: Package
+        run: tar -czf libcronet-$VERSION.tar.gz chromium-$VERSION/out/Release/cronet
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: libcronet-$VERSION.tar.gz
