@@ -1,0 +1,56 @@
+From 5ef39cdfc6a5c153ed3a83ba891d60763eab9cd5 Mon Sep 17 00:00:00 2001
+From: Zifei Tong <zifeitong@gmail.com>
+Date: Wed, 20 Aug 2025 22:00:54 -0700
+Subject: [PATCH 4/4] Hide private cronet symbols
+
+---
+ components/cronet/BUILD.gn                  |  7 +++++++
+ components/cronet/native/cronet_exports.map | 11 +++++++++++
+ 2 files changed, 18 insertions(+)
+ create mode 100644 components/cronet/native/cronet_exports.map
+
+diff --git a/components/cronet/BUILD.gn b/components/cronet/BUILD.gn
+index 3d722dbea6..dde05af2a0 100644
+--- a/components/cronet/BUILD.gn
++++ b/components/cronet/BUILD.gn
+@@ -35,6 +35,12 @@ if (is_android) {
+   }
+ }
+ 
++config("hide_private_cronet_symbols") {
++  _version_script = "native/cronet_exports.map"
++  inputs = [ _version_script ]
++  ldflags = [ "-Wl,--version-script=" + rebase_path(_version_script, root_out_dir) ]
++}
++
+ # Cronet common implementation.
+ source_set("cronet_common") {
+   sources = [
+@@ -118,6 +124,7 @@ if (is_android) {
+     # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
+     # enable the diagnostic by removing this line.
+     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
++    configs += [ ":hide_private_cronet_symbols" ]
+   }
+ 
+   test("cronet_tests") {
+diff --git a/components/cronet/native/cronet_exports.map b/components/cronet/native/cronet_exports.map
+new file mode 100644
+index 0000000000..d99b1a22a1
+--- /dev/null
++++ b/components/cronet/native/cronet_exports.map
+@@ -0,0 +1,11 @@
++# Copyright 2017 The Chromium Authors
++# Use of this source code is governed by a BSD-style license that can be
++# found in the LICENSE file.
++
++# Linker script that exports symbols required for Cronet Native API to work.
++{
++  global:
++    Cronet_*;
++  local:
++    *;
++};
+-- 
+2.51.2
+

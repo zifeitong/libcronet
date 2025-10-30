@@ -1,0 +1,25 @@
+From 581b6dbee2e6b4855281764179a5a9b801b7658a Mon Sep 17 00:00:00 2001
+From: Zifei Tong <zifeitong@gmail.com>
+Date: Sat, 16 Aug 2025 17:10:34 -0700
+Subject: [PATCH 1/4] Enable EVRootCAMetadata in Linux w/o NSS
+
+---
+ net/cert/ev_root_ca_metadata.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/cert/ev_root_ca_metadata.h b/net/cert/ev_root_ca_metadata.h
+index 9c029289df..cb5d7305b0 100644
+--- a/net/cert/ev_root_ca_metadata.h
++++ b/net/cert/ev_root_ca_metadata.h
+@@ -17,7 +17,7 @@
+ #include "net/cert/x509_certificate.h"
+ 
+ #if BUILDFLAG(USE_NSS_CERTS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || \
+-    BUILDFLAG(IS_FUCHSIA)
++    BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_LINUX)
+ // When not defined, the EVRootCAMetadata singleton is a dumb placeholder
+ // implementation that will fail all EV lookup operations.
+ #define PLATFORM_USES_CHROMIUM_EV_METADATA
+-- 
+2.51.2
+

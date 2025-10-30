@@ -1,0 +1,48 @@
+From ac1d8ec15d491f9b024db6b26a2c3f1c54f46cf7 Mon Sep 17 00:00:00 2001
+From: Zifei Tong <zifeitong@gmail.com>
+Date: Sat, 16 Aug 2025 17:13:25 -0700
+Subject: [PATCH 2/4] Allow Linux build without NSS certs
+
+by using only Chrome Root Store.
+---
+ net/BUILD.gn                            | 4 ++++
+ net/cert/internal/system_trust_store.cc | 8 ++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/net/BUILD.gn b/net/BUILD.gn
+index 6975ed49b2..e73a0466ee 100644
+--- a/net/BUILD.gn
++++ b/net/BUILD.gn
+@@ -1609,6 +1609,10 @@ component("net") {
+     # fixed, switch this to a non-public config, so NSS usage must be explicit
+     # in the build.
+     public_configs = [ "//build/config/linux/nss" ]
++  } else if (is_linux) {
++    sources += [
++      "cert/test_root_certs_builtin.cc",
++    ]
+   }
+ 
+   if (is_fuchsia) {
+diff --git a/net/cert/internal/system_trust_store.cc b/net/cert/internal/system_trust_store.cc
+index b5e7af2bae..0531866e57 100644
+--- a/net/cert/internal/system_trust_store.cc
++++ b/net/cert/internal/system_trust_store.cc
+@@ -219,6 +219,14 @@ std::unique_ptr<SystemTrustStore> CreateSslSystemTrustStoreChromeRoot(
+                                   TrustStoreNSS::UseTrustFromAllUserSlots()));
+ }
+ 
++#elif BUILDFLAG(IS_LINUX)
++
++std::unique_ptr<SystemTrustStore> CreateSslSystemTrustStoreChromeRoot(
++    std::unique_ptr<TrustStoreChrome> chrome_root) {
++  return std::make_unique<SystemTrustStoreChrome>(
++      std::move(chrome_root), /*trust_store_system=*/nullptr);
++}
++
+ #elif BUILDFLAG(IS_MAC)
+ 
+ namespace {
+-- 
+2.51.2
+

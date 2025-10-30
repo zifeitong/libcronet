@@ -1,0 +1,67 @@
+name: Build and release cronet_native
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"
+
+jobs:
+  check-latest-version:
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: read
+
+    outputs:
+      VERSION: ${{ steps.get_version.outputs.VERSION }}
+      NEW_VERSION_FOUND: ${{ steps.get_version.outputs.NEW_VERSION_FOUND }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5.0.0
+
+      - name: Get the latest chromium version
+        id: get_version
+        run: |
+          VERSION=`curl https://versionhistory.googleapis.com/v1/chrome/platforms/linux/channels/stable/versions | jq -r .versions[0].version`
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          grep -q $VERSION bazel/cronet_native.MODULE.bazel || echo "NEW_VERSION_FOUND=true" >> $GITHUB_OUTPUT
+
+  build-and-release:
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+
+    needs: check-latest-version
+
+    if: ${{ needs.check-latest-version.outputs.NEW_VERSION_FOUND == 'true'}}
+
+    env:
+      VERSION: ${{ needs.check-latest-version.outputs.VERSION }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5.0.0
+
+      - name: Build cronet
+        run: scripts/build.sh $VERSION
+
+      - name: Package cronet
+        run: scripts/package.sh $VERSION
+
+      - name: Commit changes and push to origin
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bazel/cronet_native.MODULE.bazel
+          git commit -m "Bump cronet_native to ${VERSION}"
+          git push
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          files: cronet_native-${{ env.VERSION }}-linux-x86_64.tar.gz
