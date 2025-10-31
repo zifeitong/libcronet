@@ -2,6 +2,11 @@ name: Build and release cronet_native
 
 on:
   workflow_dispatch:
+    inputs:
+      rebuild:
+        type: boolean
+        description: "Rebuild cronet_native and update the release"
+        default: false
   schedule:
     - cron: "0 8 * * *"
 
@@ -37,7 +42,7 @@ jobs:
 
     needs: check-latest-version
 
-    if: ${{ needs.check-latest-version.outputs.NEW_VERSION_FOUND == 'true'}}
+    if: ${{ needs.check-latest-version.outputs.NEW_VERSION_FOUND == 'true' || inputs.rebuild }}
 
     env:
       VERSION: ${{ needs.check-latest-version.outputs.VERSION }}
