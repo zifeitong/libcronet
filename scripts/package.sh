@@ -14,12 +14,14 @@ cat > BUILD.bazel <<EOF
 cc_import(
   name = "cronet_native",
   hdrs = [
-    "cronet_c.h",
-    "cronet_export.h",
-    "cronet.idl_c.h",
-    "bidirectional_stream_c.h",
+    "include/cronet_c.h",
+    "include/cronet_export.h",
+    "include/cronet.idl_c.h",
+    "include/bidirectional_stream_c.h",
   ],
   shared_library = "libcronet.${pkgver}.so",
+  includes = ["include"],
+  visibility = ["//visibility:public"],
 )
 EOF
 
