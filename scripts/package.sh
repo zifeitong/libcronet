@@ -20,7 +20,7 @@ cc_import(
     "include/bidirectional_stream_c.h",
   ],
   shared_library = "libcronet.${pkgver}.so",
-  includes = ["include"],
+  strip_include_prefix = "include",
   visibility = ["//visibility:public"],
 )
 EOF
