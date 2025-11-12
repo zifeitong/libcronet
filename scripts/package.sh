@@ -8,9 +8,13 @@ pushd chromium-$pkgver/out/Release/cronet
 # Define bazel module
 cat > MODULE.bazel <<EOF
 module(name = "cronet_native", version = "${pkgver}")
+
+bazel_dep(name = "rules_cc", version = "0.2.14")
 EOF
 
 cat > BUILD.bazel <<EOF
+load("@rules_cc//cc:cc_import.bzl", "cc_import")
+
 cc_import(
   name = "cronet_native",
   hdrs = [
