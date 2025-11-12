@@ -58,5 +58,15 @@ gn_args=(
   'icu_use_data_file=false'
 )
 
-buildtools/linux64/gn gen out/Release --args="${gn_args[*]}"
-third_party/siso/cipd/siso ninja --offline -C out/Release cronet_package
+buildtools/linux64/gn gen out/release --args="${gn_args[*]}"
+third_party/siso/cipd/siso ninja --offline -C out/release cronet_package
+
+# Build for arm64
+./build/install-build-deps.sh --arm
+./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
+
+gn_args+=(
+  'target_cpu="arm64"'
+)
+buildtools/linux64/gn gen out/release_arm64 --args="${gn_args[*]}"
+third_party/siso/cipd/siso ninja --offline -C out/release_arm64 cronet_package

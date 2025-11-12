@@ -69,4 +69,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
-          files: cronet_native-${{ env.VERSION }}-linux-x86_64.tar.gz
+          files: cronet_native-${{ env.VERSION }}-linux.tar.gz
