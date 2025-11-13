@@ -9,5 +9,5 @@ cc_binary(
         "sample_url_request_callback.cc",
         "sample_url_request_callback.h",
     ],
-    deps = ["@cronet_native"],
+    deps = ["@prebuilt_cronet_native"],
 )

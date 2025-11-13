@@ -1,11 +1,11 @@
-name: Build and release cronet_native
+name: Build and release prebuilt_cronet_native
 
 on:
   workflow_dispatch:
     inputs:
       rebuild:
         type: boolean
-        description: "Rebuild cronet_native and update the release"
+        description: "Rebuild prebuilt_cronet_native and update the release"
         default: false
   schedule:
     - cron: "0 8 * * *"
@@ -30,7 +30,7 @@ jobs:
         run: |
           VERSION=`curl https://versionhistory.googleapis.com/v1/chrome/platforms/linux/channels/stable/versions | jq -r .versions[0].version`
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          grep -q $VERSION bazel/cronet_native.MODULE.bazel || echo "NEW_VERSION_FOUND=true" >> $GITHUB_OUTPUT
+          grep -q $VERSION bazel/prebuilt_cronet_native.MODULE.bazel || echo "NEW_VERSION_FOUND=true" >> $GITHUB_OUTPUT
 
   build-and-release:
     runs-on: ubuntu-24.04
@@ -61,12 +61,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bazel/cronet_native.MODULE.bazel
-          git commit -m "Bump cronet_native to ${VERSION}"
+          git add bazel/prebuilt_cronet_native.MODULE.bazel
+          git commit -m "Bump prebuilt_cronet_native to ${VERSION}"
           git push
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
-          files: cronet_native-${{ env.VERSION }}-linux.tar.gz
+          files: prebuilt_cronet_native-${{ env.VERSION }}-linux.tar.gz
