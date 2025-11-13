@@ -39,8 +39,8 @@ cc_import(
     "include/bidirectional_stream_c.h",
   ],
   shared_library = select({
-    ":cpu_x86_64": "x86_64/libcronet.${pkgver}.so",
-    ":cpu_arm64": "arm64/ibcronet.${pkgver}.so",
+    ":cpu_x86_64": ":x86_64/libcronet.${pkgver}.so",
+    ":cpu_arm64": ":arm64/ibcronet.${pkgver}.so",
   }),
   strip_include_prefix = "include",
   visibility = ["//visibility:public"],
