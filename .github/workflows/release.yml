@@ -48,6 +48,9 @@ jobs:
       VERSION: ${{ needs.check-latest-version.outputs.VERSION }}
 
     steps:
+      - name: Free up disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android
+
       - name: Checkout repository
         uses: actions/checkout@v5.0.0
 
