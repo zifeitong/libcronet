@@ -2,4 +2,4 @@ bazel-bin
 bazel-out
 bazel-testlogs
 bazel-src
-bazel-libcronet
+bazel-cronet-http
