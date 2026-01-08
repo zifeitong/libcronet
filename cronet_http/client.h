@@ -20,7 +20,8 @@ class Client {
   Client();
   ~Client();
 
-  auto Send(const Request& request) -> std::expected<Response, Error>;
+  auto Send(const Request& request)
+      -> std::expected<std::unique_ptr<Response>, Error>;
 
  private:
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_Engine, engine_);

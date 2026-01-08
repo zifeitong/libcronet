@@ -1,9 +1,11 @@
+# Based on .clang-format of carbon-lang
+
 BasedOnStyle: Google
-AllowShortBlocksOnASingleLine: 'false'
+AllowShortBlocksOnASingleLine: "false"
 AllowShortIfStatementsOnASingleLine: Never
-AllowShortLoopsOnASingleLine: 'false'
-DerivePointerAlignment: 'false'
-ExperimentalAutoDetectBinPacking: 'false'
-FixNamespaceComments: 'true'
-InsertBraces: 'true'
+AllowShortLoopsOnASingleLine: "false"
+DerivePointerAlignment: "false"
+ExperimentalAutoDetectBinPacking: "false"
+FixNamespaceComments: "true"
+InsertBraces: "true"
 PointerAlignment: Left

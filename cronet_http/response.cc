@@ -1,7 +1,5 @@
 #include "cronet_http/response.h"
 
-#include <string_view>
-
 namespace cronet_http {
 
 namespace {
@@ -19,6 +17,51 @@ Response::Response()
           Response::OnReadCompleted, Response::OnSucceeded, Response::OnFailed,
           Response::OnCanceled)) {
   Cronet_UrlRequestCallback_SetClientContext(callback_, this);
+  Cronet_Buffer_InitWithAlloc(buffer_.get(), kBufferSize);
+}
+
+Response::~Response() {
+  if (!IsCompleted()) {
+    Cronet_UrlRequest_Cancel(request_.get());
+  }
+  WaitUntilCompleted();
+}
+
+bool Response::Read(const std::byte** data, size_t* bytes_read) {
+  Cronet_UrlRequest_Read(request_.get(), buffer_.get());
+
+  mutex_.LockWhen(absl::Condition(this, &Response::IsReadCompleted));
+  if (IsCompleted()) {
+    mutex_.Unlock();
+    return false;
+  }
+  ready_to_read_ = false;
+  mutex_.Unlock();
+
+  *data = static_cast<const std::byte*>(Cronet_Buffer_GetData(buffer_.get()));
+  *bytes_read = last_bytes_read_;
+  return true;
+}
+
+bool Response::IsReadCompleted() const {
+  return IsCompleted() || ready_to_read_;
+};
+
+void Response::WaitUntilStarted() const {
+  mutex_.LockWhen(absl::Condition(this, &Response::IsStarted));
+  mutex_.Unlock();
+};
+
+bool Response::IsStarted() const { return state_ != State::kNew; };
+
+void Response::WaitUntilCompleted() const {
+  mutex_.LockWhen(absl::Condition(this, &Response::IsCompleted));
+  mutex_.Unlock();
+};
+
+bool Response::IsCompleted() const {
+  return (state_ == State::kSucceeded || state_ == State::kFailed ||
+          state_ == State::kCancelled);
 }
 
 void Response::OnRedirectReceived(Cronet_UrlRequestPtr request,
@@ -32,28 +75,39 @@ void Response::OnResponseStarted(Cronet_UrlRequestPtr request,
   http_status_code_ = Cronet_UrlResponseInfo_http_status_code_get(info);
   http_status_text_ = Cronet_UrlResponseInfo_http_status_text_get(info);
 
-  Cronet_BufferPtr buffer = Cronet_Buffer_Create();
-  Cronet_Buffer_InitWithAlloc(buffer, 32 * 1024);
-  Cronet_UrlRequest_Read(request, buffer);
+  {
+    absl::MutexLock lock(&mutex_);
+    state_ = State::kStarted;
+  }
 }
 
 void Response::OnReadCompleted(Cronet_UrlRequestPtr request,
                                Cronet_UrlResponseInfoPtr info,
                                Cronet_BufferPtr buffer, uint64_t bytes_read) {
-  std::string last_read_data(
-      reinterpret_cast<char*>(Cronet_Buffer_GetData(buffer)), bytes_read);
-  Cronet_UrlRequest_Read(request, buffer);
+  {
+    absl::MutexLock lock(&mutex_);
+    last_bytes_read_ = bytes_read;
+    ready_to_read_ = true;
+  }
 }
 
 void Response::OnSucceeded(Cronet_UrlRequestPtr request,
-                           Cronet_UrlResponseInfoPtr info) {}
+                           Cronet_UrlResponseInfoPtr info) {
+  absl::MutexLock lock(&mutex_);
+  state_ = State::kSucceeded;
+}
 
 void Response::OnFailed(Cronet_UrlRequestPtr request,
                         Cronet_UrlResponseInfoPtr info, Cronet_ErrorPtr error) {
+  absl::MutexLock lock(&mutex_);
+  state_ = State::kFailed;
 }
 
 void Response::OnCanceled(Cronet_UrlRequestPtr request,
-                          Cronet_UrlResponseInfoPtr info) {}
+                          Cronet_UrlResponseInfoPtr info) {
+  absl::MutexLock lock(&mutex_);
+  state_ = State::kCancelled;
+}
 
 /* static */ void Response::OnRedirectReceived(
     Cronet_UrlRequestCallbackPtr self, Cronet_UrlRequestPtr request,

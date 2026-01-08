@@ -18,6 +18,8 @@ cc_library(
     ],
     deps = [
         "//cronet_http/internal:memory",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/synchronization",
         "@prebuilt_cronet_native",
     ],
 )
