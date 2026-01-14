@@ -91,7 +91,7 @@ class Response {
 
   // Internal states.
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_UrlRequest, request_);
-  MAKE_CRONET_C_UNIQUE_PTR(Cronet_Buffer, buffer_);
+  Cronet_BufferPtr buffer_;
   Cronet_UrlRequestCallbackPtr const callback_;
 
   mutable absl::Mutex mutex_;

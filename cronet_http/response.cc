@@ -17,7 +17,10 @@ Response::Response()
           Response::OnReadCompleted, Response::OnSucceeded, Response::OnFailed,
           Response::OnCanceled)) {
   Cronet_UrlRequestCallback_SetClientContext(callback_, this);
-  Cronet_Buffer_InitWithAlloc(buffer_.get(), kBufferSize);
+  // Cronet_Buffer lifetime is managed by the cronet internally.
+  MAKE_CRONET_C_UNIQUE_PTR(Cronet_Buffer, buffer);
+  buffer_ = buffer.release();
+  Cronet_Buffer_InitWithAlloc(buffer_, kBufferSize);
 }
 
 Response::~Response() {
@@ -28,7 +31,7 @@ Response::~Response() {
 }
 
 bool Response::Read(const std::byte** data, size_t* bytes_read) {
-  Cronet_UrlRequest_Read(request_.get(), buffer_.get());
+  Cronet_UrlRequest_Read(request_.get(), buffer_);
 
   mutex_.LockWhen(absl::Condition(this, &Response::IsReadCompleted));
   if (IsCompleted()) {
@@ -38,7 +41,7 @@ bool Response::Read(const std::byte** data, size_t* bytes_read) {
   ready_to_read_ = false;
   mutex_.Unlock();
 
-  *data = static_cast<const std::byte*>(Cronet_Buffer_GetData(buffer_.get()));
+  *data = static_cast<const std::byte*>(Cronet_Buffer_GetData(buffer_));
   *bytes_read = last_bytes_read_;
   return true;
 }
