@@ -27,7 +27,6 @@ ls ../patches/*.patch | xargs -n 1 patch -p1 -i
 ./tools/rust/update_rust.py
 ./build/install-build-deps.sh
 ./build/linux/sysroot_scripts/install-sysroot.py --arch=x64
-ln -s google.star ./build/config/siso/backend_config/backend.star
 
 # Build shared library
 gn_args=(
