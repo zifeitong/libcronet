@@ -35,11 +35,11 @@ bool Response::Read(const std::byte** data, size_t* bytes_read) {
 
   mutex_.LockWhen(absl::Condition(this, &Response::IsReadCompleted));
   if (IsCompleted()) {
-    mutex_.Unlock();
+    mutex_.unlock();
     return false;
   }
   ready_to_read_ = false;
-  mutex_.Unlock();
+  mutex_.unlock();
 
   *data = static_cast<const std::byte*>(Cronet_Buffer_GetData(buffer_));
   *bytes_read = last_bytes_read_;
@@ -52,14 +52,14 @@ bool Response::IsReadCompleted() const {
 
 void Response::WaitUntilStarted() const {
   mutex_.LockWhen(absl::Condition(this, &Response::IsStarted));
-  mutex_.Unlock();
+  mutex_.unlock();
 };
 
 bool Response::IsStarted() const { return state_ != State::kNew; };
 
 void Response::WaitUntilCompleted() const {
   mutex_.LockWhen(absl::Condition(this, &Response::IsCompleted));
-  mutex_.Unlock();
+  mutex_.unlock();
 };
 
 bool Response::IsCompleted() const {
@@ -79,7 +79,7 @@ void Response::OnResponseStarted(Cronet_UrlRequestPtr request,
   http_status_text_ = Cronet_UrlResponseInfo_http_status_text_get(info);
 
   {
-    absl::MutexLock lock(&mutex_);
+    absl::MutexLock lock(mutex_);
     state_ = State::kStarted;
   }
 }
@@ -88,7 +88,7 @@ void Response::OnReadCompleted(Cronet_UrlRequestPtr request,
                                Cronet_UrlResponseInfoPtr info,
                                Cronet_BufferPtr buffer, uint64_t bytes_read) {
   {
-    absl::MutexLock lock(&mutex_);
+    absl::MutexLock lock(mutex_);
     last_bytes_read_ = bytes_read;
     ready_to_read_ = true;
   }
@@ -96,19 +96,19 @@ void Response::OnReadCompleted(Cronet_UrlRequestPtr request,
 
 void Response::OnSucceeded(Cronet_UrlRequestPtr request,
                            Cronet_UrlResponseInfoPtr info) {
-  absl::MutexLock lock(&mutex_);
+  absl::MutexLock lock(mutex_);
   state_ = State::kSucceeded;
 }
 
 void Response::OnFailed(Cronet_UrlRequestPtr request,
                         Cronet_UrlResponseInfoPtr info, Cronet_ErrorPtr error) {
-  absl::MutexLock lock(&mutex_);
+  absl::MutexLock lock(mutex_);
   state_ = State::kFailed;
 }
 
 void Response::OnCanceled(Cronet_UrlRequestPtr request,
                           Cronet_UrlResponseInfoPtr info) {
-  absl::MutexLock lock(&mutex_);
+  absl::MutexLock lock(mutex_);
   state_ = State::kCancelled;
 }
 

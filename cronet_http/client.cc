@@ -11,6 +11,7 @@ Client::Client() {
   Cronet_EngineParams_user_agent_set(engine_params.get(), "CronetSample/1");
   Cronet_EngineParams_enable_quic_set(engine_params.get(), true);
 
+
   Cronet_Engine_StartWithParams(engine_.get(), engine_params.get());
 }
 
