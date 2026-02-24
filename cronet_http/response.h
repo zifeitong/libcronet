@@ -14,8 +14,8 @@ class Response {
  public:
   ~Response();
 
-  int32_t http_status_code() { return http_status_code_; };
-  std::string http_status_text() { return http_status_text_; };
+  int32_t http_status_code() { return http_status_code_; }
+  std::string http_status_text() { return http_status_text_; }
 
   bool Read(const std::byte** data, size_t* bytes_read);
 

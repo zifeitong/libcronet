@@ -8,8 +8,6 @@ cc_library(
         "client.cc",
         "request.cc",
         "response.cc",
-        "sample_executor.cc",
-        "sample_executor.h",
     ],
     hdrs = [
         "client.h",
@@ -17,6 +15,7 @@ cc_library(
         "response.h",
     ],
     deps = [
+        "//cronet_http/internal:executor",
         "//cronet_http/internal:memory",
         "@abseil-cpp//absl/memory",
         "@abseil-cpp//absl/synchronization",

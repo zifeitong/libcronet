@@ -6,10 +6,10 @@
 #include <stop_token>
 
 #include "cronet_c.h"
+#include "cronet_http/internal/executor.h"
 #include "cronet_http/internal/memory.h"
 #include "cronet_http/request.h"
 #include "cronet_http/response.h"
-#include "cronet_http/sample_executor.h"
 
 namespace cronet_http {
 
@@ -20,12 +20,12 @@ class Client {
   Client();
   ~Client();
 
-  auto Send(const Request& request)
+  auto Do(const Request& request)
       -> std::expected<std::unique_ptr<Response>, Error>;
 
  private:
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_Engine, engine_);
-  SampleExecutor executor_;
+  internal::Executor executor_;
 };
 
 }  // namespace cronet_http

@@ -48,14 +48,14 @@ bool Response::Read(const std::byte** data, size_t* bytes_read) {
 
 bool Response::IsReadCompleted() const {
   return IsCompleted() || ready_to_read_;
-};
+}
 
 void Response::WaitUntilStarted() const {
   mutex_.LockWhen(absl::Condition(this, &Response::IsStarted));
   mutex_.unlock();
-};
+}
 
-bool Response::IsStarted() const { return state_ != State::kNew; };
+bool Response::IsStarted() const { return state_ != State::kNew; }
 
 void Response::WaitUntilCompleted() const {
   mutex_.LockWhen(absl::Condition(this, &Response::IsCompleted));

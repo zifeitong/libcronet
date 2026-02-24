@@ -6,3 +6,14 @@ cc_library(
     name = "memory",
     hdrs = ["memory.h"],
 )
+
+cc_library(
+    name = "executor",
+    hdrs = ["executor.h"],
+    srcs = ["executor.cc"],
+    deps = [
+        "@prebuilt_cronet_native",
+        "@abseil-cpp//absl/synchronization",
+        "//cronet_http/internal:memory",
+    ],
+)

@@ -18,6 +18,11 @@ struct deleter {
     T##_Create()                                                        \
   }
 
+#define MAKE_CRONET_C_UNIQUE_PTR_WITH(T, var, ...)                                \
+  std::unique_ptr<T, cronet_http::internal::deleter<T##_Destroy>> var { \
+    T##_CreateWith(__VA_ARGS__)                                                        \
+  }
+
 }  // namespace cronet_http::internal
 
 #endif  // CRONET_HTTP_INTERNAL_UTIL_H_

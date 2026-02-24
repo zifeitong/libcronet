@@ -11,13 +11,12 @@ Client::Client() {
   Cronet_EngineParams_user_agent_set(engine_params.get(), "CronetSample/1");
   Cronet_EngineParams_enable_quic_set(engine_params.get(), true);
 
-
   Cronet_Engine_StartWithParams(engine_.get(), engine_params.get());
 }
 
 Client::~Client() { Cronet_Engine_Shutdown(engine_.get()); }
 
-auto Client::Send(const Request& request)
+auto Client::Do(const Request& request)
     -> std::expected<std::unique_ptr<Response>, Error> {
   // Build Cronet_UrlRequestParams.
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_UrlRequestParams, request_params);

@@ -13,7 +13,7 @@ int main() {
   req.set_url("https://example.com");
 
   Client client;
-  auto resp = client.Send(req);
+  auto resp = client.Do(req);
 
   if (resp) {
     std::cout << "HTTP Status Code: " << (*resp)->http_status_code()
