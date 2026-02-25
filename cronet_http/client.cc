@@ -6,12 +6,19 @@
 
 namespace cronet_http {
 
-Client::Client() {
-  MAKE_CRONET_C_UNIQUE_PTR(Cronet_EngineParams, engine_params);
-  Cronet_EngineParams_user_agent_set(engine_params.get(), "CronetSample/1");
-  Cronet_EngineParams_enable_quic_set(engine_params.get(), true);
+std::unique_ptr<Client> Client::Create() {
+    auto client = absl::WrapUnique(new Client());
 
-  Cronet_Engine_StartWithParams(engine_.get(), engine_params.get());
+    MAKE_CRONET_C_UNIQUE_PTR(Cronet_EngineParams, engine_params);
+    Cronet_EngineParams_user_agent_set(engine_params.get(), "CronetSample/1");
+    Cronet_EngineParams_enable_quic_set(engine_params.get(), true);
+
+    auto result = Cronet_Engine_StartWithParams(client->engine_.get(), engine_params.get());
+    if (result != Cronet_RESULT_SUCCESS) {
+        return nullptr;
+    }
+
+    return client;
 }
 
 Client::~Client() { Cronet_Engine_Shutdown(engine_.get()); }

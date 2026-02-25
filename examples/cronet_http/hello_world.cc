@@ -12,8 +12,8 @@ int main() {
   Request req;
   req.set_url("https://example.com");
 
-  Client client;
-  auto resp = client.Do(req);
+  auto client = Client::Create();
+  auto resp = client->Do(req);
 
   if (resp) {
     std::cout << "HTTP Status Code: " << (*resp)->http_status_code()
@@ -24,7 +24,7 @@ int main() {
 
     std::string body;
     while ((*resp)->Read(&data, &bytes_read)) {
-      body += std::string_view(std::bit_cast<char*>(data), bytes_read);
+      body += std::string_view(std::bit_cast<const char*>(data), bytes_read);
     }
     std::cout << body << std::endl;
   }

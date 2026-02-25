@@ -15,13 +15,17 @@ class Error {};
 
 class Client {
  public:
-  Client();
+  static std::unique_ptr<Client> Create();
+
   ~Client();
 
   auto Do(const Request& request)
       -> std::expected<std::unique_ptr<Response>, Error>;
 
  private:
+  // Private constructor, use Create() factory method instead.
+  Client() = default;
+
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_Engine, engine_);
   internal::Executor executor_;
 };
