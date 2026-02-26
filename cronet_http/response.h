@@ -92,7 +92,12 @@ class Response {
   // Internal states.
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_UrlRequest, request_);
   Cronet_BufferPtr buffer_;
-  Cronet_UrlRequestCallbackPtr const callback_;
+  MAKE_CRONET_C_UNIQUE_PTR_WITH(Cronet_UrlRequestCallback, callback_,
+                                Response::OnRedirectReceived,
+                                Response::OnResponseStarted,
+                                Response::OnReadCompleted,
+                                Response::OnSucceeded, Response::OnFailed,
+                                Response::OnCanceled);
 
   mutable absl::Mutex mutex_;
   State state_ ABSL_GUARDED_BY(mutex_) = State::kNew;

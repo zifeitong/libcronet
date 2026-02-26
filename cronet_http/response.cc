@@ -11,12 +11,8 @@ Response* GetThis(Cronet_UrlRequestCallbackPtr self) {
 
 }  // namespace
 
-Response::Response()
-    : callback_(Cronet_UrlRequestCallback_CreateWith(
-          Response::OnRedirectReceived, Response::OnResponseStarted,
-          Response::OnReadCompleted, Response::OnSucceeded, Response::OnFailed,
-          Response::OnCanceled)) {
-  Cronet_UrlRequestCallback_SetClientContext(callback_, this);
+Response::Response() {
+  Cronet_UrlRequestCallback_SetClientContext(callback_.get(), this);
   // Cronet_Buffer lifetime is managed by the cronet internally.
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_Buffer, buffer);
   buffer_ = buffer.release();

@@ -28,7 +28,7 @@ auto Client::Do(const Request& request)
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_UrlRequest, url_request);
   Cronet_UrlRequest_InitWithParams(
       url_request.get(), engine_.get(), request.url().c_str(),
-      request_params.get(), response->callback_, executor_.GetExecutor());
+      request_params.get(), response->callback_.get(), executor_.GetExecutor());
   Cronet_UrlRequest_Start(url_request.get());
 
   // Transfer ownership of url_request to response.
