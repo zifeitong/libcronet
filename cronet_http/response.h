@@ -35,24 +35,24 @@ class Response {
   Response();
 
   // Wait until the request is started.
-  void WaitUntilStarted() const;
-  bool IsStarted() const;
+  bool WaitUntilStarted() const;
+  bool IsStarted() const ABSL_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   // Wait until the request is completed (succeeded, failed or cancelled).
   void WaitUntilCompleted() const;
-  bool IsCompleted() const;
+  bool IsCompleted() const ABSL_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   // Wait until the read is completed (succeeded or finished).
-  bool IsReadCompleted() const;
+  bool IsReadCompleted() const ABSL_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   // Implementation of Cronet_UrlRequestCallback interface.
   void OnRedirectReceived(Cronet_UrlRequestPtr request,
                           Cronet_UrlResponseInfoPtr info,
-                          Cronet_String newLocationUrl);
+                          Cronet_String new_location_url);
   static void OnRedirectReceived(Cronet_UrlRequestCallbackPtr self,
                                  Cronet_UrlRequestPtr request,
                                  Cronet_UrlResponseInfoPtr info,
-                                 Cronet_String newLocationUrl);
+                                 Cronet_String new_location_url);
 
   void OnResponseStarted(Cronet_UrlRequestPtr request,
                          Cronet_UrlResponseInfoPtr info);

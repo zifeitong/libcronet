@@ -3,9 +3,7 @@
 
 #include <expected>
 #include <memory>
-#include <stop_token>
 
-#include "cronet_c.h"
 #include "cronet_http/internal/executor.h"
 #include "cronet_http/internal/memory.h"
 #include "cronet_http/request.h"

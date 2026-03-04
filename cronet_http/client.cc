@@ -34,8 +34,8 @@ auto Client::Do(const Request& request)
   // Transfer ownership of url_request to response.
   response->request_ = std::move(url_request);
 
-  response->WaitUntilStarted();
-  if (response->state_ != Response::State::kFailed) {
+  bool is_success = response->WaitUntilStarted();
+  if (is_success) {
     return response;
   } else {
     return std::unexpected(Error{});

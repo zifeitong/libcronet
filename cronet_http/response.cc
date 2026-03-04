@@ -35,10 +35,11 @@ bool Response::Read(const std::byte** data, size_t* bytes_read) {
     return false;
   }
   ready_to_read_ = false;
-  mutex_.unlock();
 
   *data = static_cast<const std::byte*>(Cronet_Buffer_GetData(buffer_));
   *bytes_read = last_bytes_read_;
+
+  mutex_.unlock();
   return true;
 }
 
@@ -46,9 +47,11 @@ bool Response::IsReadCompleted() const {
   return IsCompleted() || ready_to_read_;
 }
 
-void Response::WaitUntilStarted() const {
+bool Response::WaitUntilStarted() const {
   mutex_.LockWhen(absl::Condition(this, &Response::IsStarted));
+  bool is_success = (state_ != Response::State::kFailed);
   mutex_.unlock();
+  return is_success;
 }
 
 bool Response::IsStarted() const { return state_ != State::kNew; }
@@ -65,7 +68,7 @@ bool Response::IsCompleted() const {
 
 void Response::OnRedirectReceived(Cronet_UrlRequestPtr request,
                                   Cronet_UrlResponseInfoPtr info,
-                                  Cronet_String newLocationUrl) {
+                                  Cronet_String new_location_url) {
   Cronet_UrlRequest_FollowRedirect(request);
 }
 
