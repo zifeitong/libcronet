@@ -20,6 +20,7 @@ fi
 pushd chromium-$pkgver
 
 # Apply patches
+cp -r ../third_party/chromium/* .
 ls ../patches/*.patch | xargs -n 1 patch -p1 -i
 
 # Setup build environment
