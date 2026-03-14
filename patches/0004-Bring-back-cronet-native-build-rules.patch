@@ -1,12 +1,28 @@
-From 536aae7cef0e16cfac9c579a29d1d625e1afca92 Mon Sep 17 00:00:00 2001
+From 205b1d9c72de87fa57d7c280af6d8261e613e6f1 Mon Sep 17 00:00:00 2001
 From: Zifei Tong <zifeitong@gmail.com>
 Date: Fri, 13 Mar 2026 21:24:56 -0700
 Subject: [PATCH] Bring back cronet-native build rules
 
 ---
+ BUILD.gn                   |   4 +
  components/cronet/BUILD.gn | 151 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 151 insertions(+)
+ 2 files changed, 155 insertions(+)
 
+diff --git a/BUILD.gn b/BUILD.gn
+index f8b354bf16..b58f458605 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -813,6 +813,10 @@ group("gn_all") {
+     if (enable_rust) {
+       deps += [ ":all_rust" ]
+     }
++
++    if (!is_android && !is_ios) {
++      deps += [ "//components/cronet:cronet_tests" ]
++    }
+   }
+ 
+   if (is_chrome_for_testing) {
 diff --git a/components/cronet/BUILD.gn b/components/cronet/BUILD.gn
 index 27668e6829..a899890d41 100644
 --- a/components/cronet/BUILD.gn
