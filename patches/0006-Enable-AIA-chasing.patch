@@ -1,18 +1,28 @@
-From 946e34aae3ed17a46a096fb3c5b9ac7066fbc6e4 Mon Sep 17 00:00:00 2001
+From 7209334cfefcd01cdf0bcdf05b29fe225fca914b Mon Sep 17 00:00:00 2001
 From: Zifei Tong <zifeitong@gmail.com>
 Date: Mon, 23 Mar 2026 21:24:50 -0700
 Subject: [PATCH] Enable AIA chasing
 
 ---
- components/cronet/cronet_context.cc | 4 ++++
+ components/cronet/cronet_context.cc | 8 ++++++++
  components/cronet/cronet_context.h  | 4 ++++
- 2 files changed, 8 insertions(+)
+ 2 files changed, 12 insertions(+)
 
 diff --git a/components/cronet/cronet_context.cc b/components/cronet/cronet_context.cc
-index 150133adf1..c806e395b2 100644
+index 150133adf1..05f608ecab 100644
 --- a/components/cronet/cronet_context.cc
 +++ b/components/cronet/cronet_context.cc
-@@ -416,6 +416,10 @@ CronetContext::NetworkTasks::BuildDefaultURLRequestContext(
+@@ -261,6 +261,9 @@ CronetContext::NetworkTasks::~NetworkTasks() {
+ 
+   if (net::NetworkChangeNotifier::AreNetworkHandlesSupported())
+     net::NetworkChangeNotifier::RemoveNetworkObserver(this);
++
++  if (cert_net_fetcher_)
++    cert_net_fetcher_->Shutdown();
+ }
+ 
+ void CronetContext::InitRequestContextOnInitThread() {
+@@ -416,7 +419,12 @@ CronetContext::NetworkTasks::BuildDefaultURLRequestContext(
          &context_builder);
    }
  
@@ -21,8 +31,10 @@ index 150133adf1..c806e395b2 100644
 +  context_builder.SetCertVerifier(std::move(cert_verifier));
 +
    auto context = context_builder.Build();
++  cert_net_fetcher_->SetURLRequestContext(context.get());
  
    // Set up host cache persistence if it's enabled. Happens after building the
+   // URLRequestContext to get access to the HostCache.
 diff --git a/components/cronet/cronet_context.h b/components/cronet/cronet_context.h
 index 76fc93195f..1c209db87f 100644
 --- a/components/cronet/cronet_context.h
