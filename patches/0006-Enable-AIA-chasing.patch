@@ -1,0 +1,50 @@
+From 946e34aae3ed17a46a096fb3c5b9ac7066fbc6e4 Mon Sep 17 00:00:00 2001
+From: Zifei Tong <zifeitong@gmail.com>
+Date: Mon, 23 Mar 2026 21:24:50 -0700
+Subject: [PATCH] Enable AIA chasing
+
+---
+ components/cronet/cronet_context.cc | 4 ++++
+ components/cronet/cronet_context.h  | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/components/cronet/cronet_context.cc b/components/cronet/cronet_context.cc
+index 150133adf1..c806e395b2 100644
+--- a/components/cronet/cronet_context.cc
++++ b/components/cronet/cronet_context.cc
+@@ -416,6 +416,10 @@ CronetContext::NetworkTasks::BuildDefaultURLRequestContext(
+         &context_builder);
+   }
+ 
++  cert_net_fetcher_ = base::MakeRefCounted<net::CertNetFetcherURLRequest>();
++  auto cert_verifier = net::CertVerifier::CreateDefault(cert_net_fetcher_);
++  context_builder.SetCertVerifier(std::move(cert_verifier));
++
+   auto context = context_builder.Build();
+ 
+   // Set up host cache persistence if it's enabled. Happens after building the
+diff --git a/components/cronet/cronet_context.h b/components/cronet/cronet_context.h
+index 76fc93195f..1c209db87f 100644
+--- a/components/cronet/cronet_context.h
++++ b/components/cronet/cronet_context.h
+@@ -24,6 +24,7 @@
+ #include "net/base/network_change_notifier.h"
+ #include "net/base/network_handle.h"
+ #include "net/base/proxy_delegate.h"
++#include "net/cert_net/cert_net_fetcher_url_request.h"
+ #include "net/http/http_request_headers.h"
+ #include "net/http/http_response_headers.h"
+ #include "net/nqe/effective_connection_type.h"
+@@ -408,6 +409,9 @@ class CronetContext {
+     // Callback implemented by the client.
+     std::unique_ptr<CronetContext::Callback> callback_;
+ 
++    // Cert fetcher for AIA URLs and CRL URLs.
++    scoped_refptr<net::CertNetFetcherURLRequest> cert_net_fetcher_;
++
+     THREAD_CHECKER(network_thread_checker_);
+   };
+ 
+-- 
+2.53.0
+
