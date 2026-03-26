@@ -7,18 +7,19 @@
 namespace cronet_http {
 
 std::unique_ptr<Client> Client::Create() {
-    auto client = absl::WrapUnique(new Client());
+  auto client = absl::WrapUnique(new Client());
 
-    MAKE_CRONET_C_UNIQUE_PTR(Cronet_EngineParams, engine_params);
-    Cronet_EngineParams_user_agent_set(engine_params.get(), "CronetSample/1");
-    Cronet_EngineParams_enable_quic_set(engine_params.get(), true);
+  MAKE_CRONET_C_UNIQUE_PTR(Cronet_EngineParams, engine_params);
+  Cronet_EngineParams_user_agent_set(engine_params.get(), "CronetSample/1");
+  Cronet_EngineParams_enable_quic_set(engine_params.get(), true);
 
-    auto result = Cronet_Engine_StartWithParams(client->engine_.get(), engine_params.get());
-    if (result != Cronet_RESULT_SUCCESS) {
-        return nullptr;
-    }
+  auto result =
+      Cronet_Engine_StartWithParams(client->engine_.get(), engine_params.get());
+  if (result != Cronet_RESULT_SUCCESS) {
+    return nullptr;
+  }
 
-    return client;
+  return client;
 }
 
 Client::~Client() { Cronet_Engine_Shutdown(engine_.get()); }
@@ -27,7 +28,12 @@ auto Client::Do(const Request& request)
     -> std::expected<std::unique_ptr<Response>, Error> {
   // Build Cronet_UrlRequestParams.
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_UrlRequestParams, request_params);
-  Cronet_UrlRequestParams_http_method_set(request_params.get(), "GET");
+  Cronet_UrlRequestParams_http_method_set(request_params.get(),
+                                          request.method().c_str());
+  if (auto upload_data_provider = request.upload_data_provider()) {
+    Cronet_UrlRequestParams_upload_data_provider_set(
+        request_params.get(), upload_data_provider->GetPtr());
+  }
 
   auto response = absl::WrapUnique(new Response());
 
@@ -36,7 +42,7 @@ auto Client::Do(const Request& request)
   Cronet_UrlRequest_InitWithParams(
       url_request.get(), engine_.get(), request.url().c_str(),
       request_params.get(), response->callback_.get(), executor_.GetExecutor());
-  Cronet_UrlRequest_Start(url_request.get());
+  Cronet_UrlRequest_Start(url_request.get());  // TODO: check return value
 
   // Transfer ownership of url_request to response.
   response->request_ = std::move(url_request);

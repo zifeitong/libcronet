@@ -27,7 +27,7 @@ Response::~Response() {
 }
 
 bool Response::Read(const std::byte** data, size_t* bytes_read) {
-  Cronet_UrlRequest_Read(request_.get(), buffer_);
+  Cronet_UrlRequest_Read(request_.get(), buffer_);  // TODO: check return value
 
   mutex_.LockWhen(absl::Condition(this, &Response::IsReadCompleted));
   if (IsCompleted()) {

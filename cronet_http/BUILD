@@ -8,11 +8,13 @@ cc_library(
         "client.cc",
         "request.cc",
         "response.cc",
+        "upload_data_provider.cc",
     ],
     hdrs = [
         "client.h",
         "request.h",
         "response.h",
+        "upload_data_provider.h",
     ],
     deps = [
         "//cronet_http/internal:executor",
