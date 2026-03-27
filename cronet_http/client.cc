@@ -1,5 +1,7 @@
 #include "cronet_http/client.h"
 
+#include <format>
+
 #include "absl/memory/memory.h"
 #include "cronet_http/internal/memory.h"
 #include "response.h"
@@ -10,8 +12,13 @@ std::unique_ptr<Client> Client::Create() {
   auto client = absl::WrapUnique(new Client());
 
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_EngineParams, engine_params);
-  Cronet_EngineParams_user_agent_set(engine_params.get(), "CronetSample/1");
-  Cronet_EngineParams_enable_quic_set(engine_params.get(), true);
+  std::string version_string =
+      Cronet_Engine_GetVersionString(client->engine_.get());
+  Cronet_EngineParams_user_agent_set(
+      engine_params.get(),
+      std::format("cronet/{}.0.0.0",
+                  version_string.substr(0, version_string.find('.')))
+          .c_str());
 
   auto result =
       Cronet_Engine_StartWithParams(client->engine_.get(), engine_params.get());
