@@ -42,6 +42,14 @@ auto Client::Do(const Request& request)
         request_params.get(), upload_data_provider->GetPtr());
   }
 
+  for (const auto& [name, value] : request.header()) {
+    MAKE_CRONET_C_UNIQUE_PTR(Cronet_HttpHeader, header);
+    Cronet_HttpHeader_name_set(header.get(), name.c_str());
+    Cronet_HttpHeader_value_set(header.get(), value.c_str());
+    Cronet_UrlRequestParams_request_headers_add(request_params.get(),
+                                                header.get());
+  }
+
   auto response = absl::WrapUnique(new Response());
 
   // Create and start Cronet_UrlRequest.

@@ -1,12 +1,15 @@
 #ifndef CRONET_HTTP_REQUEST_H_
 #define CRONET_HTTP_REQUEST_H_
 
+#include <flat_map>
 #include <string>
 #include <string_view>
 
 #include "cronet_http/upload_data_provider.h"
 
 namespace cronet_http {
+
+using Header = std::flat_map<std::string, std::string>;
 
 class Request {
  public:
@@ -15,6 +18,9 @@ class Request {
 
   const std::string& url() const { return url_; }
   void set_url(std::string url) { url_ = std::move(url); }
+
+  const Header& header() const { return header_; }
+  void set_header(Header header) { header_ = std::move(header); }
 
   const UploadDataProvider* upload_data_provider() const {
     return upload_data_provider_.get();
@@ -27,6 +33,7 @@ class Request {
  private:
   std::string method_;
   std::string url_;
+  Header header_;
   std::unique_ptr<UploadDataProvider> upload_data_provider_;
 };
 

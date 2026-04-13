@@ -45,6 +45,7 @@ int main() {
     Request req;
     req.set_method("POST");
     req.set_url("https://httpbin.org/post");
+    req.set_header({{"Header0", "Foo"}, {"Header1", "Bar"}});
     req.set_upload_data_provider(
         std::make_unique<InMemoryUploadDataProvider>("hello"));
 
