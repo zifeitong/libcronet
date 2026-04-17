@@ -49,7 +49,7 @@ void InMemoryUploadDataProvider::Read(Cronet_UploadDataSinkPtr upload_data_sink,
                                       Cronet_BufferPtr buffer) {
   size_t bytes_read =
       std::min(data_.size() - position_, Cronet_Buffer_GetSize(buffer));
-  std::copy_n(data_.data(), bytes_read,
+  std::copy_n(data_.data() + position_, bytes_read,
               static_cast<char*>(Cronet_Buffer_GetData(buffer)));
   position_ += bytes_read;
   Cronet_UploadDataSink_OnReadSucceeded(upload_data_sink, bytes_read,
