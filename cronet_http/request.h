@@ -1,15 +1,13 @@
 #ifndef CRONET_HTTP_REQUEST_H_
 #define CRONET_HTTP_REQUEST_H_
 
-#include <flat_map>
 #include <string>
 #include <string_view>
 
+#include "cronet_http/header.h"
 #include "cronet_http/upload_data_provider.h"
 
 namespace cronet_http {
-
-using Header = std::flat_map<std::string, std::string>;
 
 class Request {
  public:

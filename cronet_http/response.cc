@@ -76,6 +76,14 @@ void Response::OnResponseStarted(Cronet_UrlRequestPtr request,
                                  Cronet_UrlResponseInfoPtr info) {
   http_status_code_ = Cronet_UrlResponseInfo_http_status_code_get(info);
   http_status_text_ = Cronet_UrlResponseInfo_http_status_text_get(info);
+  negotiated_protocol_ = Cronet_UrlResponseInfo_negotiated_protocol_get(info);
+
+  auto num_headers = Cronet_UrlResponseInfo_all_headers_list_size(info);
+  for (size_t i = 0; i < num_headers; ++i) {
+    auto* header = Cronet_UrlResponseInfo_all_headers_list_at(info, i);
+    header_.emplace(Cronet_HttpHeader_name_get(header),
+                    Cronet_HttpHeader_value_get(header));
+  }
 
   {
     absl::MutexLock lock(mutex_);

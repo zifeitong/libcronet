@@ -7,6 +7,7 @@
 #include "absl/synchronization/mutex.h"
 #include "cronet_c.h"
 #include "cronet_http/internal/memory.h"
+#include "cronet_http/header.h"
 
 namespace cronet_http {
 
@@ -15,7 +16,9 @@ class Response {
   ~Response();
 
   int32_t http_status_code() const { return http_status_code_; }
-  std::string http_status_text() const { return http_status_text_; }
+  const std::string& http_status_text() const { return http_status_text_; }
+  const std::string& negotiated_protocol() const { return negotiated_protocol_; }
+  const Header& header() const { return header_; }
 
   bool Read(const std::byte** data, size_t* bytes_read);
 
@@ -88,6 +91,8 @@ class Response {
   // Response data.
   int32_t http_status_code_;
   std::string http_status_text_;
+  std::string negotiated_protocol_;
+  Header header_;
 
   // Internal states.
   MAKE_CRONET_C_UNIQUE_PTR(Cronet_UrlRequest, request_);

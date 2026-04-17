@@ -13,6 +13,12 @@ using cronet_http::Response;
 
 void ReadAndPrintResponse(Response& resp) {
   std::cout << "HTTP Status Code: " << resp.http_status_code() << std::endl;
+  std::cout << "Negotiated Protocol: " << resp.negotiated_protocol() << std::endl;
+  std::cout << "Response Header:" << std::endl;
+  for (const auto& [name, value] : resp.header()) {
+      std::cout << "  " << name << ": " << value << std::endl;
+  }
+  std::cout << "\nBody:" << std::endl;
 
   const std::byte* data;
   size_t bytes_read;

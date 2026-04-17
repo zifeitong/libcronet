@@ -12,6 +12,7 @@ cc_library(
     ],
     hdrs = [
         "client.h",
+        "header.h",
         "request.h",
         "response.h",
         "upload_data_provider.h",
